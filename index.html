@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Kostenloser ISO-Passungsrechner & Toleranzfeld-Rechner nach DIN ISO 286. Spiel- und Übermaßpassungen schnell & präzise berechnen.">
+    <meta name="theme-color" content="#1e293b">
+    <title>IsoFitCalc - ISO Passungsrechner (DIN ISO 286)</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-512.png">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #38bdf8;
+            --primary-hover: #0284c7;
+            --accent-green: #22c55e;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --border: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 540px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        header {
+            text-align: center;
+            padding: 12px 0;
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary);
+        }
+
+        .quick-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .preset-btn {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Results Display */
+        .fit-type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-spiel { background-color: rgba(34, 197, 94, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .badge-uebergang { background-color: rgba(245, 158, 11, 0.2); color: var(--accent-amber); border: 1px solid var(--accent-amber); }
+        .badge-press { background-color: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .sub-card {
+            background-color: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sub-card-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 4px;
+        }
+
+        .res-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            margin-bottom: 4px;
+        }
+
+        .res-label { color: var(--text-muted); }
+        .res-val { font-weight: 600; font-family: monospace; }
+
+        .fit-summary {
+            grid-column: span 2;
+            background-color: rgba(15, 23, 42, 0.8);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 4px;
+        }
+
+        /* SVG Visualization */
+        .viz-container {
+            width: 100%;
+            height: 180px;
+            background-color: rgba(15, 23, 42, 0.9);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Support / Buy Me A Coffee */
+        .coffee-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #ffdd00;
+            color: #000000;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: transform 0.2s, opacity 0.2s;
+            margin-top: 8px;
+        }
+
+        .coffee-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding: 16px 0;
+            margin-top: auto;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>⚙️ IsoFitCalc</h1>
+        <p>ISO Passungs- & Toleranzfeldrechner (DIN ISO 286)</p>
+    </header>
+
+    <!-- INPUT CARD -->
+    <div class="card">
+        <div class="card-title">Eingabe</div>
+        
+        <div class="input-group">
+            <label for="nominal">Nennmaß (mm)</label>
+            <input type="number" id="nominal" value="30" min="0.1" max="500" step="any" placeholder="z.B. 30">
+        </div>
+
+        <div class="input-group">
+            <label>Passungsauswahl (Bohrung / Welle)</label>
+            <div class="input-row">
+                <select id="hole-letter">
+                    <option value="H" selected>H (Einheitsbohrung)</option>
+                    <option value="F">F</option>
+                    <option value="G">G</option>
+                    <option value="JS">JS</option>
+                    <option value="K">K</option>
+                    <option value="M">M</option>
+
+                    <option value="N">N</option>
+                    <option value="P">P</option>
+                </select>
+                <select id="hole-grade">
+                    <option value="6">6</option>
+                    <option value="7" selected>7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="11">11</option>
+                </select>
+                <select id="shaft-letter">
+                    <option value="f">f</option>
+                    <option value="g">g</option>
+                    <option value="h">h (Einheitswelle)</option>
+                    <option value="js">js</option>
+                    <option value="k">k</option>
+                    <option value="m">m</option>
+                    <option value="n">n</option>
+                    <option value="p">p</option>
+                    <option value="r">r</option>
+                    <option value="s">s</option>
+                </select>
+            </div>
+            <div class="input-row" style="margin-top: 6px;">
+                <div style="grid-column: span 2; font-size: 0.75rem; color: var(--text-muted); display:flex; align-items:center;">
+                    Wellen-Toleranzgrad:
+                </div>
+                <select id="shaft-grade">
+                    <option value="5">5</option>
+                    <option value="6" selected>6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Typische Passungskombinationen:</label>
+            <div class="quick-presets">
+                <button class="preset-btn" onclick="setPreset('H7', 'f6')">H7 / f6 (Laufpassung)</button>
+                <button class="preset-btn" onclick="setPreset('H7', 'g6')">H7 / g6 (Gleitpassung)</button>
+                <button class="preset-btn" onclick="setPreset('H7', 'h6')">H7 / h6 (Übergang/Möglichst klein)</button>
+                <button class="preset-btn" onclick="setPreset('H7', 'k6')">H7 / k6 (Haftpassung)</button>
+                <button class="preset-btn" onclick="setPreset('H7', 'n6')">H7 / n6 (Fügepassung)</button>
+                <button class="preset-btn" onclick="setPreset('H7', 'p6')">H7 / p6 (Presspassung)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULTS CARD -->
+    <div class="card">
+        <div class="card-title">
+            <span>Ergebnis</span>
+            <span id="fit-badge" class="fit-type-badge badge-spiel">Spielpassung</span>
+        </div>
+
+        <div class="result-grid">
+            <!-- Bohrung -->
+            <div class="sub-card">
+                <div class="sub-card-title">Bohrung (<span id="txt-hole-code">H7</span>)</div>
+                <div class="res-row"><span class="res-label">ES (Amm):</span><span class="res-val" id="res-hole-ES">+0.021</span></div>
+                <div class="res-row"><span class="res-label">EI (Abm):</span><span class="res-val" id="res-hole-EI">+0.000</span></div>
+                <div class="res-row"><span class="res-label">Max (Dmax):</span><span class="res-val" id="res-hole-max">30.021</span></div>
+                <div class="res-row"><span class="res-label">Min (Dmin):</span><span class="res-val" id="res-hole-min">30.000</span></div>
+                <div class="res-row"><span class="res-label">Toleranz:</span><span class="res-val" id="res-hole-tol">0.021 mm</span></div>
+            </div>
+
+            <!-- Welle -->
+            <div class="sub-card">
+                <div class="sub-card-title">Welle (<span id="txt-shaft-code">f6</span>)</div>
+                <div class="res-row"><span class="res-label">es (Amm):</span><span class="res-val" id="res-shaft-es">-0.020</span></div>
+                <div class="res-row"><span class="res-label">ei (Abm):</span><span class="res-val" id="res-shaft-ei">-0.033</span></div>
+                <div class="res-row"><span class="res-label">Max (dmax):</span><span class="res-val" id="res-shaft-max">29.980</span></div>
+                <div class="res-row"><span class="res-label">Min (dmin):</span><span class="res-val" id="res-shaft-min">29.967</span></div>
+                <div class="res-row"><span class="res-label">Toleranz:</span><span class="res-val" id="res-shaft-tol">0.013 mm</span></div>
+            </div>
+
+            <!-- Passungs-Kennwerte -->
+            <div class="fit-summary">
+                <div class="sub-card-title" style="color: var(--text-main);">Passungskennwerte</div>
+                <div class="res-row" id="row-pass-1"><span class="res-label">Max. Spiel (Pmax):</span><span class="res-val" id="res-fit-pmax" style="color:var(--accent-green)">+0.054 mm</span></div>
+                <div class="res-row" id="row-pass-2"><span class="res-label">Min. Spiel (Pmin):</span><span class="res-val" id="res-fit-pmin" style="color:var(--accent-green)">+0.020 mm</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISUALIZATION CARD -->
+    <div class="card">
+        <div class="card-title">Toleranzfeld-Lage (Nulllinie)</div>
+        <div class="viz-container">
+            <svg id="viz-svg" viewBox="0 0 400 180">
+                <!-- SVG elements will be drawn dynamically -->
+            </svg>
+        </div>
+    </div>
+
+    <!-- MONETIZATION / SUPPORT -->
+    <a href="https://www.buymeacoffee.com" target="_blank" class="coffee-btn">
+        ☕ Entwickler unterstützen (Buy Me a Coffee)
+    </a>
+
+    <footer>
+        <p>IsoFitCalc &bull; DIN ISO 286 Berechnungstool</p>
+        <p style="margin-top: 4px;">PWA App &bull; Funktioniert 100% Offline</p>
+    </footer>
+</div>
+
+<script>
+/* ISO 286 Tables (Simplified Matrix for Engineering Utility up to 500mm) */
+const IT_GRADES = {
+    // IT5, IT6, IT7, IT8, IT9, IT11 in µm for ranges: (0-3], (3-6], (6-10], (10-18], (18-30], (30-50], (50-80], (80-120], (120-180], (180-250], (250-315], (315-400], (400-500]
+    5:  [3, 4, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20],
+    6:  [4, 5, 6, 8, 9, 11, 13, 16, 19, 22, 25, 27, 29],
+    7:  [10, 12, 15, 18, 21, 25, 30, 35, 40, 46, 52, 57, 63],
+    8:  [14, 18, 22, 27, 33, 39, 46, 54, 63, 72, 81, 89, 97],
+    9:  [25, 30, 36, 43, 52, 62, 74, 87, 100, 115, 130, 140, 155],
+    11: [60, 75, 90, 110, 130, 160, 190, 220, 250, 290, 320, 360, 400]
+};
+
+const RANGES = [
+    [0, 3], [3, 6], [6, 10], [10, 18], [18, 30], [30, 50],
+    [50, 80], [80, 120], [120, 180], [180, 250], [250, 315], [315, 400], [400, 500]
+];
+
+function getRangeIndex(d) {
+    for (let i = 0; i < RANGES.length; i++) {
+        if (d > RANGES[i][0] && d <= RANGES[i][1]) return i;
+    }
+    if (d <= 0) return 0;
+    return RANGES.length - 1; // > 500
+}
+
+/* Fundamental Deviations in µm */
+function getHoleEI(letter, dIndex, itVal) {
+    if (letter === 'H') return 0;
+    if (letter === 'JS') return -itVal / 2;
+    // Approximations for standard cases
+    const devMap = {
+        'F': [6, 10, 13, 16, 20, 25, 30, 36, 43, 50, 56, 62, 68],
+        'G': [2, 4, 5, 6, 7, 9, 10, 12, 14, 15, 17, 18, 20],
+        'K': [0, -1, -1, -2, -2, -2, -3, -3, -4, -4, -4, -5, -5],
+        'M': [-2, -4, -4, -4, -4, -4, -5, -5, -7, -8, -9, -10, -10],
+        'N': [-4, -8, -9, -10, -12, -14, -16, -18, -21, -23, -26, -28, -30],
+        'P': [-6, -12, -15, -18, -22, -26, -32, -37, -43, -50, -56, -62, -68]
+    };
+    return (devMap[letter] ? devMap[letter][dIndex] : 0);
+}
+
+function getShaftes(letter, dIndex, itVal) {
+    if (letter === 'h') return 0;
+    if (letter === 'js') return itVal / 2;
+    const devMap = {
+        'f': [-6, -10, -13, -16, -20, -25, -30, -36, -43, -50, -56, -62, -68],
+        'g': [-2, -4, -5, -6, -7, -9, -10, -12, -14, -15, -17, -18, -20],
+        'k': [0, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5],
+        'm': [2, 4, 4, 4, 4, 4, 5, 5, 7, 8, 9, 10, 10],
+        'n': [4, 8, 9, 10, 12, 14, 16, 18, 21, 23, 26, 28, 30],
+        'p': [6, 12, 15, 18, 22, 26, 32, 37, 43, 50, 56, 62, 68],
+        'r': [10, 16, 19, 23, 28, 34, 41, 48, 60, 70, 79, 88, 98],
+        's': [14, 20, 23, 28, 35, 43, 53, 64, 79, 94, 108, 122, 137]
+    };
+    return (devMap[letter] ? devMap[letter][dIndex] : 0);
+}
+
+function calculate() {
+    const nominal = parseFloat(document.getElementById('nominal').value) || 30;
+    const holeL = document.getElementById('hole-letter').value;
+    const holeG = parseInt(document.getElementById('hole-grade').value);
+    const shaftL = document.getElementById('shaft-letter').value;
+    const shaftG = parseInt(document.getElementById('shaft-grade').value);
+
+    const dIdx = getRangeIndex(nominal);
+
+    // IT Values in µm
+    const holeIT = IT_GRADES[holeG][dIdx];
+    const shaftIT = IT_GRADES[shaftG][dIdx];
+
+    // Hole Abmaße (in µm)
+    const holeEI = getHoleEI(holeL, dIdx, holeIT);
+    const holeES = holeEI + holeIT;
+
+    // Shaft Abmaße (in µm)
+    const shaftes = getShaftes(shaftL, dIdx, shaftIT);
+    const shaftei = shaftes - shaftIT;
+
+    // Convert to mm
+    const hEI_mm = holeEI / 1000;
+    const hES_mm = holeES / 1000;
+    const sEI_mm = shaftei / 1000;
+    const sES_mm = shaftes / 1000;
+
+    const holeMax = nominal + hES_mm;
+    const holeMin = nominal + hEI_mm;
+    const shaftMax = nominal + sES_mm;
+    const shaftMin = nominal + sEI_mm;
+
+    // Passungsberechnung
+    const maxSpiel = holeMax - shaftMin;
+    const minSpiel = holeMin - shaftMax;
+
+    // Update Text UI
+    document.getElementById('txt-hole-code').innerText = `${holeL}${holeG}`;
+    document.getElementById('txt-shaft-code').innerText = `${shaftL}${shaftG}`;
+
+    document.getElementById('res-hole-ES').innerText = (hES_mm >= 0 ? '+' : '') + hES_mm.toFixed(3);
+    document.getElementById('res-hole-EI').innerText = (hEI_mm >= 0 ? '+' : '') + hEI_mm.toFixed(3);
+    document.getElementById('res-hole-max').innerText = holeMax.toFixed(3);
+    document.getElementById('res-hole-min').innerText = holeMin.toFixed(3);
+    document.getElementById('res-hole-tol').innerText = (holeIT / 1000).toFixed(3) + ' mm';
+
+    document.getElementById('res-shaft-es').innerText = (sES_mm >= 0 ? '+' : '') + sES_mm.toFixed(3);
+    document.getElementById('res-shaft-ei').innerText = (sEI_mm >= 0 ? '+' : '') + sEI_mm.toFixed(3);
+    document.getElementById('res-shaft-max').innerText = shaftMax.toFixed(3);
+    document.getElementById('res-shaft-min').innerText = shaftMin.toFixed(3);
+    document.getElementById('res-shaft-tol').innerText = (shaftIT / 1000).toFixed(3) + ' mm';
+
+    const badge = document.getElementById('fit-badge');
+    const pmaxLabel = document.getElementById('res-fit-pmax');
+    const pminLabel = document.getElementById('res-fit-pmin');
+
+    if (minSpiel >= 0) {
+        // Spielpassung
+        badge.innerText = "Spielpassung";
+        badge.className = "fit-type-badge badge-spiel";
+        document.getElementById('row-pass-1').children[0].innerText = "Max. Spiel (Pmax):";
+        document.getElementById('row-pass-2').children[0].innerText = "Min. Spiel (Pmin):";
+        pmaxLabel.innerText = "+" + maxSpiel.toFixed(3) + " mm";
+        pmaxLabel.style.color = "var(--accent-green)";
+        pminLabel.innerText = "+" + minSpiel.toFixed(3) + " mm";
+        pminLabel.style.color = "var(--accent-green)";
+    } else if (maxSpiel <= 0) {
+        // Presspassung
+        badge.innerText = "Presspassung";
+        badge.className = "fit-type-badge badge-press";
+        document.getElementById('row-pass-1').children[0].innerText = "Max. Übermaß (Umax):";
+        document.getElementById('row-pass-2').children[0].innerText = "Min. Übermaß (Umin):";
+        pmaxLabel.innerText = Math.abs(minSpiel).toFixed(3) + " mm";
+        pmaxLabel.style.color = "var(--accent-red)";
+        pminLabel.innerText = Math.abs(maxSpiel).toFixed(3) + " mm";
+        pminLabel.style.color = "var(--accent-red)";
+    } else {
+        // Übergangspassung
+        badge.innerText = "Übergangspassung";
+        badge.className = "fit-type-badge badge-uebergang";
+        document.getElementById('row-pass-1').children[0].innerText = "Max. Spiel (Pmax):";
+        document.getElementById('row-pass-2').children[0].innerText = "Max. Übermaß (Umax):";
+        pmaxLabel.innerText = "+" + maxSpiel.toFixed(3) + " mm";
+        pmaxLabel.style.color = "var(--accent-green)";
+        pminLabel.innerText = Math.abs(minSpiel).toFixed(3) + " mm";
+        pminLabel.style.color = "var(--accent-red)";
+    }
+
+    drawVisualization(holeEI, holeES, shaftei, shaftes);
+}
+
+function drawVisualization(hEI, hES, sEI, sES) {
+    const svg = document.getElementById('viz-svg');
+    const zeroY = 90; // Center line
+    
+    // Scale factor (micrometers to pixels)
+    const maxDev = Math.max(Math.abs(hEI), Math.abs(hES), Math.abs(sEI), Math.abs(sES), 20);
+    const scale = 60 / maxDev;
+
+    const holeTopY = zeroY - (hES * scale);
+    const holeBotY = zeroY - (hEI * scale);
+    const holeHeight = Math.max(Math.abs(holeBotY - holeTopY), 4);
+
+    const shaftTopY = zeroY - (sES * scale);
+    const shaftBotY = zeroY - (sEI * scale);
+    const shaftHeight = Math.max(Math.abs(shaftBotY - shaftTopY), 4);
+
+    svg.innerHTML = `
+        <!-- Nulllinie -->
+        <line x1="20" y1="${zeroY}" x2="380" y2="${zeroY}" stroke="#94a3b8" stroke-dasharray="4" stroke-width="1.5"/>
+        <text x="25" y="${zeroY - 6}" fill="#94a3b8" font-size="11" font-weight="600">Nulllinie (0.000)</text>
+
+        <!-- Bohrung Box -->
+        <rect x="110" y="${Math.min(holeTopY, holeBotY)}" width="70" height="${holeHeight}" fill="rgba(56, 189, 248, 0.4)" stroke="#38bdf8" stroke-width="2" rx="3"/>
+        <text x="145" y="${Math.min(holeTopY, holeBotY) - 8}" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">Bohrung</text>
+
+        <!-- Welle Box -->
+        <rect x="220" y="${Math.min(shaftTopY, shaftBotY)}" width="70" height="${shaftHeight}" fill="rgba(245, 158, 11, 0.4)" stroke="#f59e0b" stroke-width="2" rx="3"/>
+        <text x="255" y="${Math.min(shaftTopY, shaftBotY) - 8}" fill="#f59e0b" font-size="12" font-weight="bold" text-anchor="middle">Welle</text>
+    `;
+}
+
+function setPreset(hole, shaft) {
+    document.getElementById('hole-letter').value = hole.charAt(0);
+    document.getElementById('hole-grade').value = hole.substring(1);
+    document.getElementById('shaft-letter').value = shaft.charAt(0);
+    document.getElementById('shaft-grade').value = shaft.substring(1);
+    calculate();
+}
+
+// Event Listeners
+document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+});
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+    navigator.registerServiceWorker = function() {
+        navigator.serviceWorker.register('sw.js').catch(()=>{});
+    };
+    window.addEventListener('load', navigator.registerServiceWorker);
+}
+
+// Initial calculation
+calculate();
+</script>
+</body>
+</html>
