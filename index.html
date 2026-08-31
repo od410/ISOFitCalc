@@ -22,6 +22,24 @@
             --accent-amber: #f59e0b;
             --accent-red: #ef4444;
             --border: #475569;
+            --svg-bg: rgba(15, 23, 42, 0.9);
+            --subcard-bg: rgba(15, 23, 42, 0.6);
+        }
+
+        [data-theme="light"] {
+            --bg-main: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-input: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --accent-green: #16a34a;
+            --accent-amber: #d97706;
+            --accent-red: #dc2626;
+            --border: #cbd5e1;
+            --svg-bg: #e2e8f0;
+            --subcard-bg: #f8fafc;
         }
 
         * {
@@ -40,6 +58,7 @@
             flex-direction: column;
             align-items: center;
             padding: 16px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .app-container {
@@ -51,8 +70,13 @@
         }
 
         header {
-            text-align: center;
-            padding: 12px 0;
+            padding: 8px 0;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         header h1 {
@@ -62,8 +86,31 @@
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .toggle-btn {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .toggle-btn:hover {
+            border-color: var(--primary);
         }
 
         header p {
@@ -77,7 +124,8 @@
             border-radius: 12px;
             padding: 16px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         .card-title {
@@ -120,7 +168,7 @@
             font-size: 1rem;
             font-weight: 500;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, background-color 0.3s, color 0.3s;
         }
 
         input[type="number"]:focus, select:focus {
@@ -171,10 +219,10 @@
         }
 
         .sub-card {
-            background-color: rgba(15, 23, 42, 0.6);
+            background-color: var(--subcard-bg);
             border-radius: 8px;
             padding: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
         }
 
         .sub-card-title {
@@ -182,7 +230,7 @@
             font-weight: 600;
             color: var(--primary);
             margin-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid var(--border);
             padding-bottom: 4px;
         }
 
@@ -198,25 +246,45 @@
 
         .fit-summary {
             grid-column: span 2;
-            background-color: rgba(15, 23, 42, 0.8);
+            background-color: var(--subcard-bg);
             border-radius: 8px;
             padding: 12px;
             margin-top: 4px;
+            border: 1px solid var(--border);
         }
 
         /* SVG Visualization */
         .viz-container {
             width: 100%;
             height: 180px;
-            background-color: rgba(15, 23, 42, 0.9);
+            background-color: var(--svg-bg);
             border-radius: 8px;
             position: relative;
             overflow: hidden;
+            border: 1px solid var(--border);
         }
 
         svg {
             width: 100%;
             height: 100%;
+        }
+
+        /* Disclaimer Box */
+        .disclaimer-card {
+            background-color: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--accent-amber);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.78rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        .disclaimer-card span {
+            font-size: 1rem;
         }
 
         /* Support / Buy Me A Coffee */
@@ -233,7 +301,7 @@
             border-radius: 8px;
             text-decoration: none;
             transition: transform 0.2s, opacity 0.2s;
-            margin-top: 8px;
+            margin-top: 4px;
         }
 
         .coffee-btn:hover {
@@ -248,32 +316,33 @@
             padding: 16px 0;
             margin-top: auto;
         }
-
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <header>
-        <h1>⚙️ IsoFitCalc</h1>
-        <p>ISO Passungs- & Toleranzfeldrechner (DIN ISO 286)</p>
+        <div class="header-top">
+            <h1>⚙️ IsoFitCalc</h1>
+            <div class="header-actions">
+                <button class="toggle-btn" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
+                <button class="toggle-btn" id="theme-btn" onclick="toggleTheme()">🌙 Dunkel</button>
+            </div>
+        </div>
+        <p id="header-subtitle">ISO Passungs- & Toleranzfeldrechner (DIN ISO 286)</p>
     </header>
 
     <!-- INPUT CARD -->
     <div class="card">
-        <div class="card-title">Eingabe</div>
+        <div class="card-title" id="title-input">Eingabe</div>
         
         <div class="input-group">
-            <label for="nominal">Nennmaß (mm)</label>
+            <label for="nominal" id="lbl-nominal">Nennmaß (mm)</label>
             <input type="number" id="nominal" value="30" min="0.1" max="500" step="any" placeholder="z.B. 30">
         </div>
 
         <div class="input-group">
-            <label>Passungsauswahl (Bohrung / Welle)</label>
+            <label id="lbl-fit-select">Passungsauswahl (Bohrung / Welle)</label>
             <div class="input-row">
                 <select id="hole-letter">
                     <option value="H" selected>H (Einheitsbohrung)</option>
@@ -282,7 +351,6 @@
                     <option value="JS">JS</option>
                     <option value="K">K</option>
                     <option value="M">M</option>
-
                     <option value="N">N</option>
                     <option value="P">P</option>
                 </select>
@@ -307,7 +375,7 @@
                 </select>
             </div>
             <div class="input-row" style="margin-top: 6px;">
-                <div style="grid-column: span 2; font-size: 0.75rem; color: var(--text-muted); display:flex; align-items:center;">
+                <div id="lbl-shaft-grade" style="grid-column: span 2; font-size: 0.75rem; color: var(--text-muted); display:flex; align-items:center;">
                     Wellen-Toleranzgrad:
                 </div>
                 <select id="shaft-grade">
@@ -320,14 +388,14 @@
         </div>
 
         <div class="input-group">
-            <label>Typische Passungskombinationen:</label>
+            <label id="lbl-presets">Typische Passungskombinationen:</label>
             <div class="quick-presets">
-                <button class="preset-btn" onclick="setPreset('H7', 'f6')">H7 / f6 (Laufpassung)</button>
-                <button class="preset-btn" onclick="setPreset('H7', 'g6')">H7 / g6 (Gleitpassung)</button>
-                <button class="preset-btn" onclick="setPreset('H7', 'h6')">H7 / h6 (Übergang/Möglichst klein)</button>
-                <button class="preset-btn" onclick="setPreset('H7', 'k6')">H7 / k6 (Haftpassung)</button>
-                <button class="preset-btn" onclick="setPreset('H7', 'n6')">H7 / n6 (Fügepassung)</button>
-                <button class="preset-btn" onclick="setPreset('H7', 'p6')">H7 / p6 (Presspassung)</button>
+                <button class="preset-btn" id="btn-preset-1" onclick="setPreset('H7', 'f6')">H7 / f6 (Laufpassung)</button>
+                <button class="preset-btn" id="btn-preset-2" onclick="setPreset('H7', 'g6')">H7 / g6 (Gleitpassung)</button>
+                <button class="preset-btn" id="btn-preset-3" onclick="setPreset('H7', 'h6')">H7 / h6 (Übergang/Möglichst klein)</button>
+                <button class="preset-btn" id="btn-preset-4" onclick="setPreset('H7', 'k6')">H7 / k6 (Haftpassung)</button>
+                <button class="preset-btn" id="btn-preset-5" onclick="setPreset('H7', 'n6')">H7 / n6 (Fügepassung)</button>
+                <button class="preset-btn" id="btn-preset-6" onclick="setPreset('H7', 'p6')">H7 / p6 (Presspassung)</button>
             </div>
         </div>
     </div>
@@ -335,34 +403,34 @@
     <!-- RESULTS CARD -->
     <div class="card">
         <div class="card-title">
-            <span>Ergebnis</span>
+            <span id="title-result">Ergebnis</span>
             <span id="fit-badge" class="fit-type-badge badge-spiel">Spielpassung</span>
         </div>
 
         <div class="result-grid">
             <!-- Bohrung -->
             <div class="sub-card">
-                <div class="sub-card-title">Bohrung (<span id="txt-hole-code">H7</span>)</div>
+                <div class="sub-card-title"><span id="lbl-hole-name">Bohrung</span> (<span id="txt-hole-code">H7</span>)</div>
                 <div class="res-row"><span class="res-label">ES (Amm):</span><span class="res-val" id="res-hole-ES">+0.021</span></div>
                 <div class="res-row"><span class="res-label">EI (Abm):</span><span class="res-val" id="res-hole-EI">+0.000</span></div>
                 <div class="res-row"><span class="res-label">Max (Dmax):</span><span class="res-val" id="res-hole-max">30.021</span></div>
                 <div class="res-row"><span class="res-label">Min (Dmin):</span><span class="res-val" id="res-hole-min">30.000</span></div>
-                <div class="res-row"><span class="res-label">Toleranz:</span><span class="res-val" id="res-hole-tol">0.021 mm</span></div>
+                <div class="res-row"><span class="res-label" id="lbl-hole-tol">Toleranz:</span><span class="res-val" id="res-hole-tol">0.021 mm</span></div>
             </div>
 
             <!-- Welle -->
             <div class="sub-card">
-                <div class="sub-card-title">Welle (<span id="txt-shaft-code">f6</span>)</div>
+                <div class="sub-card-title"><span id="lbl-shaft-name">Welle</span> (<span id="txt-shaft-code">f6</span>)</div>
                 <div class="res-row"><span class="res-label">es (Amm):</span><span class="res-val" id="res-shaft-es">-0.020</span></div>
                 <div class="res-row"><span class="res-label">ei (Abm):</span><span class="res-val" id="res-shaft-ei">-0.033</span></div>
                 <div class="res-row"><span class="res-label">Max (dmax):</span><span class="res-val" id="res-shaft-max">29.980</span></div>
                 <div class="res-row"><span class="res-label">Min (dmin):</span><span class="res-val" id="res-shaft-min">29.967</span></div>
-                <div class="res-row"><span class="res-label">Toleranz:</span><span class="res-val" id="res-shaft-tol">0.013 mm</span></div>
+                <div class="res-row"><span class="res-label" id="lbl-shaft-tol">Toleranz:</span><span class="res-val" id="res-shaft-tol">0.013 mm</span></div>
             </div>
 
             <!-- Passungs-Kennwerte -->
             <div class="fit-summary">
-                <div class="sub-card-title" style="color: var(--text-main);">Passungskennwerte</div>
+                <div class="sub-card-title" id="title-fit-summary" style="color: var(--text-main);">Passungskennwerte</div>
                 <div class="res-row" id="row-pass-1"><span class="res-label">Max. Spiel (Pmax):</span><span class="res-val" id="res-fit-pmax" style="color:var(--accent-green)">+0.054 mm</span></div>
                 <div class="res-row" id="row-pass-2"><span class="res-label">Min. Spiel (Pmin):</span><span class="res-val" id="res-fit-pmin" style="color:var(--accent-green)">+0.020 mm</span></div>
             </div>
@@ -371,7 +439,7 @@
 
     <!-- VISUALIZATION CARD -->
     <div class="card">
-        <div class="card-title">Toleranzfeld-Lage (Nulllinie)</div>
+        <div class="card-title" id="title-viz">Toleranzfeld-Lage (Nulllinie)</div>
         <div class="viz-container">
             <svg id="viz-svg" viewBox="0 0 400 180">
                 <!-- SVG elements will be drawn dynamically -->
@@ -379,21 +447,161 @@
         </div>
     </div>
 
+    <!-- HINWEIS / DISCLAIMER BOX -->
+    <div class="disclaimer-card">
+        <span>⚠️</span>
+        <div>
+            <strong id="disclaimer-hdr">Hinweis:</strong> <span id="disclaimer-txt">Alle Berechnungen erfolgen ohne Gewähr. Trotz sorgfältiger Programmierung können Fehler nicht ausgeschlossen werden. Prüfe sicherheitsrelevante Fertigungsmaße stets im offiziellen DIN-ISO-286-Tabellenbuch.</span>
+        </div>
+    </div>
+
     <!-- MONETIZATION / SUPPORT -->
-    <a href="https://www.buymeacoffee.com" target="_blank" class="coffee-btn">
+    <a href="https://www.buymeacoffee.com" target="_blank" class="coffee-btn" id="coffee-link">
         ☕ Entwickler unterstützen (Buy Me a Coffee)
     </a>
 
     <footer>
-        <p>IsoFitCalc &bull; DIN ISO 286 Berechnungstool</p>
-        <p style="margin-top: 4px;">PWA App &bull; Funktioniert 100% Offline</p>
+        <p id="footer-text">IsoFitCalc &bull; DIN ISO 286 Berechnungstool</p>
+        <p id="footer-pwa" style="margin-top: 4px;">PWA App &bull; Funktioniert 100% Offline</p>
     </footer>
 </div>
 
 <script>
+/* TRANSLATIONS DICTIONARY */
+const TRANSLATIONS = {
+    de: {
+        subtitle: "ISO Passungs- & Toleranzfeldrechner (DIN ISO 286)",
+        inputTitle: "Eingabe",
+        nominalLabel: "Nennmaß (mm)",
+        fitSelectionLabel: "Passungsauswahl (Bohrung / Welle)",
+        shaftGradeLabel: "Wellen-Toleranzgrad:",
+        presetsLabel: "Typische Passungskombinationen:",
+        resultTitle: "Ergebnis",
+        holeTitle: "Bohrung",
+        shaftTitle: "Welle",
+        toleranceLabel: "Toleranz:",
+        fitSummaryTitle: "Passungskennwerte",
+        vizTitle: "Toleranzfeld-Lage (Nulllinie)",
+        disclaimerHeader: "Hinweis:",
+        disclaimerText: "Alle Berechnungen erfolgen ohne Gewähr. Trotz sorgfältiger Programmierung können Fehler nicht ausgeschlossen werden. Prüfe sicherheitsrelevante Fertigungsmaße stets im offiziellen DIN-ISO-286-Tabellenbuch.",
+        coffeeBtn: "☕ Entwickler unterstützen (Buy Me a Coffee)",
+        footerText: "IsoFitCalc • DIN ISO 286 Berechnungstool",
+        footerPwa: "PWA App • Funktioniert 100% Offline",
+        zeroLine: "Nulllinie (0.000)",
+        badgeSpiel: "Spielpassung",
+        badgeUebergang: "Übergangspassung",
+        badgePress: "Presspassung",
+        maxSpiel: "Max. Spiel (Pmax):",
+        minSpiel: "Min. Spiel (Pmin):",
+        maxUebermass: "Max. Übermaß (Umax):",
+        minUebermass: "Min. Übermaß (Umin):",
+        preset1: "H7 / f6 (Laufpassung)",
+        preset2: "H7 / g6 (Gleitpassung)",
+        preset3: "H7 / h6 (Übergang/Möglichst klein)",
+        preset4: "H7 / k6 (Haftpassung)",
+        preset5: "H7 / n6 (Fügepassung)",
+        preset6: "H7 / p6 (Presspassung)",
+        langBtn: "🌐 EN"
+    },
+    en: {
+        subtitle: "ISO Fit & Tolerance Zone Calculator (DIN ISO 286)",
+        inputTitle: "Input",
+        nominalLabel: "Nominal Size (mm)",
+        fitSelectionLabel: "Fit Selection (Hole / Shaft)",
+        shaftGradeLabel: "Shaft IT Grade:",
+        presetsLabel: "Common Fit Combinations:",
+        resultTitle: "Result",
+        holeTitle: "Hole",
+        shaftTitle: "Shaft",
+        toleranceLabel: "Tolerance:",
+        fitSummaryTitle: "Fit Parameters",
+        vizTitle: "Tolerance Zone Position (Zero Line)",
+        disclaimerHeader: "Note:",
+        disclaimerText: "All calculations are provided without warranty. Errors cannot be completely excluded. Always verify critical manufacturing dimensions in official ISO 286 tables.",
+        coffeeBtn: "☕ Support Developer (Buy Me a Coffee)",
+        footerText: "IsoFitCalc • DIN ISO 286 Calculation Tool",
+        footerPwa: "PWA App • Works 100% Offline",
+        zeroLine: "Zero Line (0.000)",
+        badgeSpiel: "Clearance Fit",
+        badgeUebergang: "Transition Fit",
+        badgePress: "Interference Fit",
+        maxSpiel: "Max Clearance (Pmax):",
+        minSpiel: "Min Clearance (Pmin):",
+        maxUebermass: "Max Interference (Umax):",
+        minUebermass: "Min Interference (Umin):",
+        preset1: "H7 / f6 (Running fit)",
+        preset2: "H7 / g6 (Sliding fit)",
+        preset3: "H7 / h6 (Close fit)",
+        preset4: "H7 / k6 (Locating fit)",
+        preset5: "H7 / n6 (Drive fit)",
+        preset6: "H7 / p6 (Press fit)",
+        langBtn: "🌐 DE"
+    }
+};
+
+let currentLang = localStorage.getItem('lang') || 'de';
+
+function toggleLang() {
+    currentLang = currentLang === 'de' ? 'en' : 'de';
+    localStorage.setItem('lang', currentLang);
+    updateLanguageUI();
+    calculate();
+}
+
+function updateLanguageUI() {
+    const t = TRANSLATIONS[currentLang];
+    document.getElementById('lang-btn').innerText = t.langBtn;
+    document.getElementById('header-subtitle').innerText = t.subtitle;
+    document.getElementById('title-input').innerText = t.inputTitle;
+    document.getElementById('lbl-nominal').innerText = t.nominalLabel;
+    document.getElementById('lbl-fit-select').innerText = t.fitSelectionLabel;
+    document.getElementById('lbl-shaft-grade').innerText = t.shaftGradeLabel;
+    document.getElementById('lbl-presets').innerText = t.presetsLabel;
+    document.getElementById('title-result').innerText = t.resultTitle;
+    document.getElementById('lbl-hole-name').innerText = t.holeTitle;
+    document.getElementById('lbl-shaft-name').innerText = t.shaftTitle;
+    document.getElementById('lbl-hole-tol').innerText = t.toleranceLabel;
+    document.getElementById('lbl-shaft-tol').innerText = t.toleranceLabel;
+    document.getElementById('title-fit-summary').innerText = t.fitSummaryTitle;
+    document.getElementById('title-viz').innerText = t.vizTitle;
+    document.getElementById('disclaimer-hdr').innerText = t.disclaimerHeader;
+    document.getElementById('disclaimer-txt').innerText = t.disclaimerText;
+    document.getElementById('coffee-link').innerText = t.coffeeBtn;
+    document.getElementById('footer-text').innerText = t.footerText;
+    document.getElementById('footer-pwa').innerText = t.footerPwa;
+
+    // Presets Buttons
+    document.getElementById('btn-preset-1').innerText = t.preset1;
+    document.getElementById('btn-preset-2').innerText = t.preset2;
+    document.getElementById('btn-preset-3').innerText = t.preset3;
+    document.getElementById('btn-preset-4').innerText = t.preset4;
+    document.getElementById('btn-preset-5').innerText = t.preset5;
+    document.getElementById('btn-preset-6').innerText = t.preset6;
+}
+
+/* Theme Toggle Handler */
+function toggleTheme() {
+    const currentTheme = document.body.getAttribute('data-theme');
+    const btn = document.getElementById('theme-btn');
+    if (currentTheme === 'light') {
+        document.body.removeAttribute('data-theme');
+        btn.innerText = '🌙 Dunkel';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.body.setAttribute('data-theme', 'light');
+        btn.innerText = '☀️ Hell';
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// Restore saved theme
+if (localStorage.getItem('theme') === 'light') {
+    document.body.setAttribute('data-theme', 'light');
+    document.getElementById('theme-btn').innerText = '☀️ Hell';
+}
+
 /* ISO 286 Tables (Simplified Matrix for Engineering Utility up to 500mm) */
 const IT_GRADES = {
-    // IT5, IT6, IT7, IT8, IT9, IT11 in µm for ranges: (0-3], (3-6], (6-10], (10-18], (18-30], (30-50], (50-80], (80-120], (120-180], (180-250], (250-315], (315-400], (400-500]
     5:  [3, 4, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20],
     6:  [4, 5, 6, 8, 9, 11, 13, 16, 19, 22, 25, 27, 29],
     7:  [10, 12, 15, 18, 21, 25, 30, 35, 40, 46, 52, 57, 63],
@@ -412,14 +620,12 @@ function getRangeIndex(d) {
         if (d > RANGES[i][0] && d <= RANGES[i][1]) return i;
     }
     if (d <= 0) return 0;
-    return RANGES.length - 1; // > 500
+    return RANGES.length - 1;
 }
 
-/* Fundamental Deviations in µm */
 function getHoleEI(letter, dIndex, itVal) {
     if (letter === 'H') return 0;
     if (letter === 'JS') return -itVal / 2;
-    // Approximations for standard cases
     const devMap = {
         'F': [6, 10, 13, 16, 20, 25, 30, 36, 43, 50, 56, 62, 68],
         'G': [2, 4, 5, 6, 7, 9, 10, 12, 14, 15, 17, 18, 20],
@@ -448,6 +654,7 @@ function getShaftes(letter, dIndex, itVal) {
 }
 
 function calculate() {
+    const t = TRANSLATIONS[currentLang];
     const nominal = parseFloat(document.getElementById('nominal').value) || 30;
     const holeL = document.getElementById('hole-letter').value;
     const holeG = parseInt(document.getElementById('hole-grade').value);
@@ -456,19 +663,15 @@ function calculate() {
 
     const dIdx = getRangeIndex(nominal);
 
-    // IT Values in µm
     const holeIT = IT_GRADES[holeG][dIdx];
     const shaftIT = IT_GRADES[shaftG][dIdx];
 
-    // Hole Abmaße (in µm)
     const holeEI = getHoleEI(holeL, dIdx, holeIT);
     const holeES = holeEI + holeIT;
 
-    // Shaft Abmaße (in µm)
     const shaftes = getShaftes(shaftL, dIdx, shaftIT);
     const shaftei = shaftes - shaftIT;
 
-    // Convert to mm
     const hEI_mm = holeEI / 1000;
     const hES_mm = holeES / 1000;
     const sEI_mm = shaftei / 1000;
@@ -479,11 +682,9 @@ function calculate() {
     const shaftMax = nominal + sES_mm;
     const shaftMin = nominal + sEI_mm;
 
-    // Passungsberechnung
     const maxSpiel = holeMax - shaftMin;
     const minSpiel = holeMin - shaftMax;
 
-    // Update Text UI
     document.getElementById('txt-hole-code').innerText = `${holeL}${holeG}`;
     document.getElementById('txt-shaft-code').innerText = `${shaftL}${shaftG}`;
 
@@ -504,31 +705,28 @@ function calculate() {
     const pminLabel = document.getElementById('res-fit-pmin');
 
     if (minSpiel >= 0) {
-        // Spielpassung
-        badge.innerText = "Spielpassung";
+        badge.innerText = t.badgeSpiel;
         badge.className = "fit-type-badge badge-spiel";
-        document.getElementById('row-pass-1').children[0].innerText = "Max. Spiel (Pmax):";
-        document.getElementById('row-pass-2').children[0].innerText = "Min. Spiel (Pmin):";
+        document.getElementById('row-pass-1').children[0].innerText = t.maxSpiel;
+        document.getElementById('row-pass-2').children[0].innerText = t.minSpiel;
         pmaxLabel.innerText = "+" + maxSpiel.toFixed(3) + " mm";
         pmaxLabel.style.color = "var(--accent-green)";
         pminLabel.innerText = "+" + minSpiel.toFixed(3) + " mm";
         pminLabel.style.color = "var(--accent-green)";
     } else if (maxSpiel <= 0) {
-        // Presspassung
-        badge.innerText = "Presspassung";
+        badge.innerText = t.badgePress;
         badge.className = "fit-type-badge badge-press";
-        document.getElementById('row-pass-1').children[0].innerText = "Max. Übermaß (Umax):";
-        document.getElementById('row-pass-2').children[0].innerText = "Min. Übermaß (Umin):";
+        document.getElementById('row-pass-1').children[0].innerText = t.maxUebermass;
+        document.getElementById('row-pass-2').children[0].innerText = t.minUebermass;
         pmaxLabel.innerText = Math.abs(minSpiel).toFixed(3) + " mm";
         pmaxLabel.style.color = "var(--accent-red)";
         pminLabel.innerText = Math.abs(maxSpiel).toFixed(3) + " mm";
         pminLabel.style.color = "var(--accent-red)";
     } else {
-        // Übergangspassung
-        badge.innerText = "Übergangspassung";
+        badge.innerText = t.badgeUebergang;
         badge.className = "fit-type-badge badge-uebergang";
-        document.getElementById('row-pass-1').children[0].innerText = "Max. Spiel (Pmax):";
-        document.getElementById('row-pass-2').children[0].innerText = "Max. Übermaß (Umax):";
+        document.getElementById('row-pass-1').children[0].innerText = t.maxSpiel;
+        document.getElementById('row-pass-2').children[0].innerText = t.maxUebermass;
         pmaxLabel.innerText = "+" + maxSpiel.toFixed(3) + " mm";
         pmaxLabel.style.color = "var(--accent-green)";
         pminLabel.innerText = Math.abs(minSpiel).toFixed(3) + " mm";
@@ -539,10 +737,10 @@ function calculate() {
 }
 
 function drawVisualization(hEI, hES, sEI, sES) {
+    const t = TRANSLATIONS[currentLang];
     const svg = document.getElementById('viz-svg');
-    const zeroY = 90; // Center line
+    const zeroY = 90;
     
-    // Scale factor (micrometers to pixels)
     const maxDev = Math.max(Math.abs(hEI), Math.abs(hES), Math.abs(sEI), Math.abs(sES), 20);
     const scale = 60 / maxDev;
 
@@ -555,17 +753,14 @@ function drawVisualization(hEI, hES, sEI, sES) {
     const shaftHeight = Math.max(Math.abs(shaftBotY - shaftTopY), 4);
 
     svg.innerHTML = `
-        <!-- Nulllinie -->
-        <line x1="20" y1="${zeroY}" x2="380" y2="${zeroY}" stroke="#94a3b8" stroke-dasharray="4" stroke-width="1.5"/>
-        <text x="25" y="${zeroY - 6}" fill="#94a3b8" font-size="11" font-weight="600">Nulllinie (0.000)</text>
+        <line x1="20" y1="${zeroY}" x2="380" y2="${zeroY}" stroke="var(--text-muted)" stroke-dasharray="4" stroke-width="1.5"/>
+        <text x="25" y="${zeroY - 6}" fill="var(--text-muted)" font-size="11" font-weight="600">${t.zeroLine}</text>
 
-        <!-- Bohrung Box -->
         <rect x="110" y="${Math.min(holeTopY, holeBotY)}" width="70" height="${holeHeight}" fill="rgba(56, 189, 248, 0.4)" stroke="#38bdf8" stroke-width="2" rx="3"/>
-        <text x="145" y="${Math.min(holeTopY, holeBotY) - 8}" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">Bohrung</text>
+        <text x="145" y="${Math.min(holeTopY, holeBotY) - 8}" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">${t.holeTitle}</text>
 
-        <!-- Welle Box -->
         <rect x="220" y="${Math.min(shaftTopY, shaftBotY)}" width="70" height="${shaftHeight}" fill="rgba(245, 158, 11, 0.4)" stroke="#f59e0b" stroke-width="2" rx="3"/>
-        <text x="255" y="${Math.min(shaftTopY, shaftBotY) - 8}" fill="#f59e0b" font-size="12" font-weight="bold" text-anchor="middle">Welle</text>
+        <text x="255" y="${Math.min(shaftTopY, shaftBotY) - 8}" fill="#f59e0b" font-size="12" font-weight="bold" text-anchor="middle">${t.shaftTitle}</text>
     `;
 }
 
@@ -577,13 +772,11 @@ function setPreset(hole, shaft) {
     calculate();
 }
 
-// Event Listeners
 document.querySelectorAll('input, select').forEach(el => {
     el.addEventListener('input', calculate);
     el.addEventListener('change', calculate);
 });
 
-// PWA Service Worker Registration
 if ('serviceWorker' in navigator) {
     navigator.registerServiceWorker = function() {
         navigator.serviceWorker.register('sw.js').catch(()=>{});
@@ -591,7 +784,8 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', navigator.registerServiceWorker);
 }
 
-// Initial calculation
+// Initial UI & Calculation Setup
+updateLanguageUI();
 calculate();
 </script>
 </body>
